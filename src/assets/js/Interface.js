@@ -1,3 +1,13 @@
+export const homeRouter = {
+    path: '/home',
+    component: resolve => require(['../../components/common/Home.vue'], resolve),
+    meta: { title: '福布斯云商' },
+    children:[
+       {
+       }
+    ]
+  };
+
 let obj = 'usercenter'
 export const role = {
     rolePage:obj + '/role/page',//分页查询角色 

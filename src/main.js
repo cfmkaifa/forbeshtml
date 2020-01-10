@@ -33,14 +33,6 @@ Vue.use(ElementUI, {
 });
 axios.defaults.baseURL = "http://129.211.88.251:888";
 Vue.prototype.baseURL = "http://129.211.88.251:888";
-
-// axios.defaults.baseURL = "http://129.211.88.251:888/systemcenter";
-// Vue.prototype.baseURL = "http://129.211.88.251:888/systemcenter";
-
-// Vue.prototype.imgURL = "http://119.3.172.164:8080/chase/sys/common/preview?filePath=";
-// Vue.prototype.downloadURL = "http://119.3.172.164:8080/chase//sys/common/download?filePath=";
-// Vue.prototype.devicePath = "ws://106.54.5.168:9188/websocket/0",//设备网关
-// Vue.prototype.sendTaskListPath = "http://106.54.5.168/api/equipment/open/sendTaskList"//任务
 Vue.prototype.axios = axios;
 Vue.prototype.getData=getData;
 // Vue.prototype.getUrl=getUrl;
@@ -48,32 +40,10 @@ Vue.prototype.deletes=deletes;
 Vue.prototype.delall=delall;
 Vue.prototype.getDates=getDates;
 Vue.prototype.getCode=getCode;
-
 const i18n = new VueI18n({
   locale: 'zh',
   messages
 })
-
-//使用钩子函数对路由进行权限跳转
-// router.beforeEach((to, from, next) => {
-//     const role = localStorage.getItem('ms_username');
-//     if (!role && to.path !== '/login') {
-//         next('/login');
-//     } else if (to.meta.permission) {
-//         // 如果是管理员权限则可进入，这里只是简单的模拟管理员权限而已
-//         role === 'admin' ? next() : next('/403');
-//     } else {
-//         // 简单的判断IE10及以下不进入富文本编辑器，该组件不兼容
-//         if (navigator.userAgent.indexOf('MSIE') > -1 && to.path === '/editor') {
-//             Vue.prototype.$alert('vue-quill-editor组件不兼容IE10及以下浏览器，请使用更高版本的浏览器查看', '浏览器不兼容通知', {
-//                 confirmButtonText: '确定'
-//             });
-//         } else {
-//             next();
-//         }
-//     }
-// })
-
 /**
  * 获取当前时间
  * 格式YYYY-MM-DD
@@ -121,20 +91,19 @@ new Vue({
     var _this = this;
     var addrt = JSON.parse(sessionStorage.getItem("routeroff"));
     var routers = JSON.parse(sessionStorage.getItem("routers"));
-
     if (addrt && addrt == true) {
-      let routarr = []
-      let obj = {
-        path: '/home',
-        component: resolve => require(['components/common/Home.vue'], resolve),
-        redirect: '/home/dashboard',
-        meta: {
-          title: '自述文件'
-        },
-        children: []
-      }
-      routarr.push(obj);
-      this.$router.addRoutes(routarr.concat(errors));
+     let routerObj = routers[0];
+      routerObj.children.map((val) => {
+        val.component = () => import('@/'+val.componentName);
+        if(val.children){
+          val.children.map((subVal)=>{
+            subVal.component = () => import('@/'+subVal.componentName);
+          });
+        }
+
+      });
+      routerObj.component = () => import('@/components/common/Home.vue');
+      this.$router.addRoutes(routers.concat(errors));
     } else {
       this.$router.addRoutes(errors);
     }
@@ -153,9 +122,7 @@ new Vue({
             sessionStorage.clear();
           }, 2000);
         } else if (response.data.token) { // 判断token是否存在，如果存在说明需要更新token
-
           Storage.localSet('token', response.data.token) // 覆盖原来的token(默认一天刷新一次)
-
         }
         return response
 
@@ -169,7 +136,6 @@ new Vue({
         let token = sessionStorage.getItem("token");
         if (token) { // 判断是否存在token，如果存在的话，则每个http header都加上token
           config.headers.common['X-Access-Token'] = `${token}`
-            
         }
         config.headers['Content-Type'] = 'application/json;charset=UTF-8'
         return config;
@@ -179,9 +145,5 @@ new Vue({
       }
 
     )
-
-
-
-
   }
 }).$mount('#app')

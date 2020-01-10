@@ -178,7 +178,7 @@
 
 </template>
 <script>
-import {role} from '../../assets/js/Interface'
+import {role} from '../../../assets/js/Interface'
 let cityOptions = [
   "编辑",
   "添加",

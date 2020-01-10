@@ -184,7 +184,7 @@
 
 </template>
 <script>
-import {user,role} from '../../assets/js/Interface'
+import {user,role} from '../../../assets/js/Interface'
 export default {
   data() {
     return {
@@ -470,7 +470,7 @@ export default {
 
     }
 .idcard_upload{
-    background: url("../../assets/img/upload.png") center no-repeat;
+    background: url("../../../assets/img/upload.png") center no-repeat;
     background-size: 100% 100%;
     height: 55px;
     width: 86px;
@@ -505,7 +505,7 @@ export default {
   position: absolute;
   right: 0px;
   top: 0px;
-  background: url("../../assets/img/real_btn_name_del.png") center no-repeat;
+  background: url("../../../assets/img/real_btn_name_del.png") center no-repeat;
   background-size: 100% 100%;
   
 }

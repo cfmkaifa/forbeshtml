@@ -83,6 +83,7 @@
 import { mapState, mapMutations } from "vuex";
 // import drag from "../common/drag";
 import { errors } from "../../router/index";
+import { homeRouter } from "../../assets/js/Interface"
     export default {
         data: function(){
             return {
@@ -130,12 +131,55 @@ import { errors } from "../../router/index";
             //   this.cheak=val;
             //   this.cheakPass=true;
             // },
-            submitForm(formName) {
-                // console.log(formName,6666)
-                
+          /**主装路由信息***/
+          assembleRouters(routers){
+            homeRouter.children = [];
+            if(typeof(routers) != 'undefined' 
+              && routers.length >0){
+                routers.map((oldRouter,index,arr)=>{
+                    /**直接路由
+                    */
+                    if("1" == oldRouter.route){
+                        let routerObj = {
+                                  path: oldRouter.redirect,
+                                  component: () => import('@/'+oldRouter.component),
+                                  componentName:oldRouter.component,
+                                  meta:oldRouter.meta,
+                                  children: []
+                            };
+                        homeRouter.children.push(routerObj);
+                    }
+                    if("0" == oldRouter.route){
+                       let routerObj = {
+                                  path:oldRouter.redirect,
+                                  meta:oldRouter.meta,
+                                  component: () => import('@/'+oldRouter.component),
+                                  componentName:oldRouter.component,
+                                  children: []
+                            };
+                        if(typeof(oldRouter.children)!='undefined' 
+                            && oldRouter.children.length >0){
+                            oldRouter.children.map((childrenRoute,index,arr)=>{
+                              let childrenRouterObj = {
+                                  path: childrenRoute.redirect,
+                                  component: () => import('@/'+childrenRoute.component),
+                                  componentName:childrenRoute.component,
+                                  meta:childrenRoute.meta,
+                                  children: []
+                              };
+                              routerObj.children.push(childrenRouterObj);
+                           })
+                           homeRouter.children.push(routerObj);
+                        }
+                    }
+                });
+            }
+          },
+          /**登录
+          **/
+          submitForm(formName) {
                     let _this=this;
                     this.$refs[formName].validate((valid) => {
-                        
                         if (valid) {                                            
                             let json={
                                 username:_this.ruleForm.username,
@@ -164,58 +208,24 @@ import { errors } from "../../router/index";
                                     })
                             
                             }  
-                        
                         const permission=()=>{
                             return new Promise((resolve,reject)=>{
                                  this.axios.get('/usercenter/permission/query-by-user').then((res)=>{
                                  res.data.code==200?resolve(res.data.result):reject(res.message);
                              })
-
                             })
-                            
                         }   
                         const saveroute=(routers)=>{                            
                             if(routers.length>0)
                             {
-                                this.setrouteoff();
-                                this.setmenu(routers);
-                                let routarr = [
-                                  {
-                                      path: '/attribute',
-                                      component: resolve => require(['components/common/Home.vue'], resolve),
-                                      children:[]
-                                  }
-                                ];
-                                // routers.map((val,index,arr)=>{
-                                //         if(val.route=="1")
-                                //         {
-                                //             let objarr={};
-                                //             objarr.path=val.redirect;                                                                                      
-                                //             objarr.component=resolve => require([`${val.component}`], resolve);
-                                //             objarr.meta=val.meta;
-                                //             obj.children.push(objarr);
-                                //         }
-                                //         else if(val.route=="0")
-                                //         {   
-                                //             if(val.children){
-                                //                 val.children.map((value)=>{
-                                //                 let objarr={};
-                                //                 objarr.path=value.redirect;
-                                //                 objarr.component=resolve => require([`${value.component}`], resolve);                                             
-                                //                 objarr.meta=value.meta;
-                                //                 obj.children.push(objarr); 
-                                //                 console.log(objarr,656565)
-                                //             })
-                                //             }
-                                            
-                                //         }
-                                //     })   
-                                    console.log(111);                   
-                                    this.saverouters(routarr);
-                                    this.$router.addRoutes(routarr);
-                                    console.log(this.$router);
-                                    this.$router.push({path:'/attribute'});
-                                    
+                              this.setrouteoff();
+                              this.setmenu(routers);  
+                              this.assembleRouters(routers);  
+                              let trouters = [];     
+                              trouters.push(homeRouter);     
+                              this.saverouters(trouters);  
+                              this.$router.addRoutes(trouters.concat(errors));
+                              this.$router.push({path:'/home/system/user'});  
                             }
                             else
                             {
@@ -223,26 +233,18 @@ import { errors } from "../../router/index";
                             }  
                         }
                         
-                            const ASYNC= async ()=>{
-                                    let logininfo=await loginVerification();
-                                    console.log(permission(),55)
-                                    let menu=await permission();                             
-                                    await saveroute(menu);
-                                }
-                                ASYNC();
+                        const ASYNC= async ()=>{
+                                let logininfo=await loginVerification();
+                                let menu=await permission();                             
+                                await saveroute(menu);
                             }
-                             else {
-                                console.log('error submit!!');
-                                return false;
-                            }
-                   });
-                
-                // else
-                // {
-                //  this.$message.warning("请托动滑块验证");
-                //  this.cheakPass=false;
-                // }               
-                
+                            ASYNC();
+                        }
+                        else {
+                          console.log('error submit!!');
+                          return false;
+                      }
+                   });          
             },
         }
         

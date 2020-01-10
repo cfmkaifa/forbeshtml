@@ -187,7 +187,7 @@
 
 </template>
 <script>
-import {permissions} from '../../assets/js/Interface'
+import {permissions} from '../../../assets/js/Interface'
 export default {
   data() {
     return {
