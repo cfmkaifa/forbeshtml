@@ -13,7 +13,7 @@
     "default-passive-events": "^1.0.10",
     "echarts": "^4.2.1",
     "element-ui": "^2.12.0",
-    "mavon-editor": "^2.6.17",
+    "mavon-editor": "^2.8.2",
     "vue": "^2.6.10",
     "vue-countupjs": "^1.0.0",
     "vue-cropperjs": "^3.0.0",
